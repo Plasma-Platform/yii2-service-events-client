@@ -4,6 +4,7 @@ namespace andreyv\events\components;
 
 use Yii;
 use yii\base\Component;
+use yii\web\HttpException;
 use yii\base\InvalidConfigException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -15,6 +16,16 @@ class EventsService extends Component implements EventsServiceInterface
      * @var string $serviceEventsUrl Service events API url
      */
     public $serviceEventsUrl;
+
+    /**
+     * @var string $scopes Access token scopes
+     */
+    public $scopes;
+
+    /**
+     * @var string $grantType Access token grant type
+     */
+    public $grantType;
 
     /**
      * @var string $authFilterId Id of auth filter module
@@ -53,7 +64,7 @@ class EventsService extends Component implements EventsServiceInterface
         if (!Yii::$app->hasModule($this->authFilterId)) {
             throw new InvalidConfigException('Module "' . $this->authFilterId . '" does not exist.');
         }
-        $authFilter = Yii::$app->hasModule($this->authFilterId);
+        $authFilter = Yii::$app->getModule($this->authFilterId);
         if (!$authFilter instanceof AuthFilterModule) {
             throw new InvalidConfigException('Auth filter module must be instance of ' . AuthFilterModule::class . ".");
         }
@@ -74,11 +85,29 @@ class EventsService extends Component implements EventsServiceInterface
     }
 
     /**
+     * Set mute exception mode
+     *
+     * @param bool $muteExceptions
+     * @return EventsService
+     */
+    public function setMuteExceptions(bool $muteExceptions): EventsService
+    {
+        $this->muteExceptions = $muteExceptions;
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function fire(string $event, array $data)
     {
-        throw new \Exception('Method does not implemented yet.');
+        return $this->sendRequest(
+            'events',
+            [
+                'name' => $event,
+                'data' => $data,
+            ]
+        );
     }
 
     /**
@@ -86,7 +115,14 @@ class EventsService extends Component implements EventsServiceInterface
      */
     public function subscribe(string $event, string $endpoint, string $method = 'post')
     {
-        throw new \Exception('Method does not implemented yet.');
+        return $this->sendRequest(
+            'event-subscriptions',
+            [
+                'event' => $event,
+                'endpoint' => $endpoint,
+                'method' => $method,
+            ]
+        );
     }
 
     /**
@@ -94,6 +130,50 @@ class EventsService extends Component implements EventsServiceInterface
      */
     public function unsubscribe(string $event, string $endpoint)
     {
-        throw new \Exception('Method does not implemented yet.');
+        return $this->sendRequest('event-subscriptions/' . $event . '/' . urlencode(trim($endpoint)), [], 'delete');
+    }
+
+    /**
+     * Send http request
+     *
+     * @param string $uri
+     * @param array $params
+     * @param string $method
+     * @return bool
+     * @throws \Exception
+     */
+    protected function sendRequest(string $uri, array $params = [], string $method = 'post')
+    {
+        if ($this->testMode) {
+            return true;
+        }
+        try {
+            $this->httpClient->{$method}(
+                $uri,
+                [
+                    'form_params' => $params,
+                    'headers' => [
+                        'Authorization' => $this->getOauthAccessToken()
+                    ]
+                ]
+            );
+        } catch (\Exception $e) {
+            if (!$this->muteExceptions) {
+                throw $e;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     * @throws HttpException
+     */
+    protected function getOauthAccessToken()
+    {
+        $response = $this->authFilter->requestAccessToken('', '', $this->scopes, false, $this->grantType);
+        return isset($response['access_token']) ? $response['access_token'] : '';
     }
 }
