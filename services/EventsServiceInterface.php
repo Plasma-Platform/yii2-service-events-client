@@ -1,6 +1,6 @@
 <?php
 
-namespace andreyv\events\components;
+namespace andreyv\events\services;
 
 interface EventsServiceInterface
 {

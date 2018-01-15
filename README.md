@@ -21,33 +21,41 @@ to the require section of your `composer.json` file.
 
 ## Usage
 
-Add the following to your config file in `components` section
+Add the following to your `bootstrap.php` file
 
 ```php
-'components' => [
-    ...
-    'events' => [
-        // Use class
-        'class' => 'andreyv\events\components\EventsService',
+Yii::$container->setSingleton(
+    indigerd\oauth2\authfilter\Module::class,
+    indigerd\oauth2\authfilter\Module::class,
+    [
+        'authFilter',
+        null,
+        [
+            'authServerUrl' => Yii::getAlias('@serviceAuthUrl'),
+            'clientId' => 'clientId',
+            'clientSecret' => 'clientSecret',
+            'testMode' => YII_ENV_TEST
+        ]
+    ]
+);
 
-        //Service events API url
-        'serviceEventsUrl' => 'https://events.example.com/api/v1/',
+Yii::$container->set(
+    andreyv\events\clients\EventsHttpClientInterface::class,
+    andreyv\events\clients\EventsHttpClient::class,
+    [
+        ['base_uri' => Yii::getAlias('@serviceEventsUrl')],
+    ]
+);
 
-        //Access token scopes
-        'scopes' => 'events-scopes',
+Yii::$container->set(
+    andreyv\events\services\EventsServiceInterface::class,
+    andreyv\events\services\EventsService::class,
+    [
+        'event-scopes',
+        'token-grant-type',
+        YII_ENV_TEST,
+    ]
+);
 
-        //Access token grant type
-        'grantType' => 'token-grant-type',
-
-        //Id of auth filter module
-        'authFilterId' => 'authfilter',
-
-        //Allows to mute http request exceptions
-        'muteExceptions' => true,
-
-        //Allows to skip real API requests for test environment
-        'testMode' => false,
-    ],
-    ...
-]
 ```
+Now you can use Events Service through [DI](http://www.yiiframework.com/doc-2.0/guide-concept-di-container.html).
