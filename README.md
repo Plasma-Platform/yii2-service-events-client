@@ -1,5 +1,5 @@
 # yii2-events
-Yii2 component allows developers to easily integrate service-events usage.
+Yii2 extension allows developers to easily integrate service-events usage.
 
 ## Installation
 
@@ -31,10 +31,10 @@ Yii::$container->setSingleton(
         'authFilter',
         null,
         [
-            'authServerUrl' => Yii::getAlias('@serviceAuthUrl'),
+            'authServerUrl' => 'https://auth.example.com/api/v1/',
             'clientId' => 'clientId',
             'clientSecret' => 'clientSecret',
-            'testMode' => YII_ENV_TEST
+            'testMode' => YII_ENV_TEST,
         ]
     ]
 );
@@ -43,7 +43,7 @@ Yii::$container->set(
     andreyv\events\clients\EventsHttpClientInterface::class,
     andreyv\events\clients\EventsHttpClient::class,
     [
-        ['base_uri' => Yii::getAlias('@serviceEventsUrl')],
+        ['base_uri' => 'https://events.example.com/api/v1/'],
     ]
 );
 
@@ -58,4 +58,4 @@ Yii::$container->set(
 );
 
 ```
-Now you can use Events Service through [DI](http://www.yiiframework.com/doc-2.0/guide-concept-di-container.html).
+Now you can use Events Service through [DI Container](http://www.yiiframework.com/doc-2.0/guide-concept-di-container.html).
