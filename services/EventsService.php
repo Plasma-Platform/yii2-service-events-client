@@ -134,7 +134,7 @@ class EventsService implements EventsServiceInterface
     {
         $response = $this->authFilter->requestAccessToken('', '', self::SCOPES, false, self::GRANT_TYPE);
         if (empty($response['access_token'])) {
-            throw new InvalidCallException('Auth service response don\'t have token: ' . json_encode($token));
+            throw new InvalidCallException('Auth service response don\'t have token: ' . json_encode($response));
         }
         $this->accessToken = $response['access_token'];
         return $response['access_token'];
