@@ -39,11 +39,8 @@ class EventsService implements EventsServiceInterface
      * @param AuthFilter $authFilter
      * @param bool $testMode
      */
-    public function __construct(
-        HttpClient $httpClient,
-        AuthFilter $authFilter,
-        bool $testMode = false
-    ) {
+    public function __construct (HttpClient $httpClient, AuthFilter $authFilter, bool $testMode = false )
+    {
         $this->httpClient = $httpClient;
         $this->authFilter = $authFilter;
         $this->testMode = $testMode;
@@ -83,7 +80,11 @@ class EventsService implements EventsServiceInterface
      */
     public function unsubscribe(string $event, string $endpoint)
     {
-        return $this->sendRequest('event-subscriptions/' . $event . '/' . urlencode(trim(trim($endpoint), '/')), [], 'delete');
+        return $this->sendRequest(
+            'event-subscriptions/' . $event . '/' . urlencode(trim(trim($endpoint), '/')),
+            [],
+            'delete'
+        );
     }
 
     /**
