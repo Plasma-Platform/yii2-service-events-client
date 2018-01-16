@@ -40,8 +40,8 @@ Yii::$container->setSingleton(
 );
 
 Yii::$container->set(
-    andreyv\events\clients\EventsHttpClientInterface::class,
-    andreyv\events\clients\EventsHttpClient::class,
+    'ServiceEventsHttpClient',
+    GuzzleHttp\Client::class,
     [
         ['base_uri' => 'https://events.example.com/api/v1/'],
     ]
@@ -51,9 +51,7 @@ Yii::$container->set(
     andreyv\events\services\EventsServiceInterface::class,
     andreyv\events\services\EventsService::class,
     [
-        'event-scopes',
-        'token-grant-type',
-        YII_ENV_TEST,
+        Yii::$container->get('ServiceEventsHttpClient'),
     ]
 );
 

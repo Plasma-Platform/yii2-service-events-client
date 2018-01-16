@@ -2,23 +2,17 @@
 
 namespace andreyv\events\services;
 
-use yii\base\BaseObject;
 use yii\web\HttpException;
+use yii\base\InvalidCallException;
 use yii\base\InvalidConfigException;
+use GuzzleHttp\Client as HttpClient;
 use indigerd\oauth2\authfilter\Module as AuthFilter;
-use andreyv\events\clients\EventsHttpClientInterface;
 
-class EventsService extends BaseObject implements EventsServiceInterface
+class EventsService implements EventsServiceInterface
 {
-    /**
-     * @var string $scopes Access token scopes
-     */
-    protected $scopes;
+    const SCOPES = 'events event-subscriptions';
 
-    /**
-     * @var string $grantType Access token grant type
-     */
-    protected $grantType;
+    const GRANT_TYPE = 'client_credentials';
 
     /**
      * @var bool $testMode Allows to skip real API requests for test environment
@@ -31,33 +25,28 @@ class EventsService extends BaseObject implements EventsServiceInterface
     protected $authFilter;
 
     /**
-     * @var EventsHttpClientInterface $httpClient Events http client
+     * @var HttpClient $httpClient Events http client
      */
     protected $httpClient;
 
     /**
-     * EventsService constructor.
-     * @param string $scopes
-     * @param string $grantType
-     * @param bool $testMode
+     * @var string $accessToken Oauth access token
+     */
+    protected $accessToken;
+
+    /**
+     * @param HttpClient $httpClient
      * @param AuthFilter $authFilter
-     * @param EventsHttpClientInterface $httpClient
-     * @param array $config
+     * @param bool $testMode
      */
     public function __construct(
-        string $scopes,
-        string $grantType,
-        bool $testMode,
+        HttpClient $httpClient,
         AuthFilter $authFilter,
-        EventsHttpClientInterface $httpClient,
-        array $config = []
+        bool $testMode = false
     ) {
-        $this->scopes = $scopes;
-        $this->grantType = $grantType;
-        $this->testMode = $testMode;
-        $this->authFilter = $authFilter;
         $this->httpClient = $httpClient;
-        parent::__construct($config);
+        $this->authFilter = $authFilter;
+        $this->testMode = $testMode;
     }
 
     /**
@@ -94,7 +83,7 @@ class EventsService extends BaseObject implements EventsServiceInterface
      */
     public function unsubscribe(string $event, string $endpoint)
     {
-        return $this->sendRequest('event-subscriptions/' . $event . '/' . urlencode(trim($endpoint)), [], 'delete');
+        return $this->sendRequest('event-subscriptions/' . $event . '/' . urlencode(trim(trim($endpoint), '/')), [], 'delete');
     }
 
     /**
@@ -117,7 +106,7 @@ class EventsService extends BaseObject implements EventsServiceInterface
             [
                 'form_params' => $params,
                 'headers' => [
-                    'Authorization' => $this->getOauthAccessToken()
+                    'Authorization' => $this->getClientAccessToken()
                 ]
             ]
         );
@@ -125,13 +114,29 @@ class EventsService extends BaseObject implements EventsServiceInterface
     }
 
     /**
+     * Returns current client access token or generates new token
+     *
+     * @return string
+     * @throws HttpException
+     * @throws InvalidConfigException
+     */
+    protected function getClientAccessToken()
+    {
+        return $this->accessToken ?? $this->requestClientAccessToken();
+    }
+
+    /**
      * @return string
      * @throws InvalidConfigException
      * @throws HttpException
      */
-    protected function getOauthAccessToken()
+    protected function requestClientAccessToken()
     {
-        $response = $this->authFilter->requestAccessToken('', '', $this->scopes, false, $this->grantType);
-        return isset($response['access_token']) ? $response['access_token'] : '';
+        $response = $this->authFilter->requestAccessToken('', '', self::SCOPES, false, self::GRANT_TYPE);
+        if (empty($response['access_token'])) {
+            throw new InvalidCallException('Auth service response don\'t have token: ' . json_encode($token));
+        }
+        $this->accessToken = $response['access_token'];
+        return $response['access_token'];
     }
 }
