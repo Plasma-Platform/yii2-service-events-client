@@ -1,5 +1,5 @@
 {
-    "name": "andreyv/yii2-events",
+    "name": "andreyv/yii2-service-events-client",
     "description": "Allows developers to easily integrate service-events usage",
     "type": "yii2-helper",
     "keywords": ["yii2", "events", "service"],

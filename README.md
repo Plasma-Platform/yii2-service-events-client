@@ -1,4 +1,4 @@
-# yii2-events
+# yii2-service-events-client
 Yii2 extension allows developers to easily integrate service-events usage.
 
 ## Installation
@@ -8,13 +8,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require andreyv/yii2-events "^1.0"
+php composer.phar require andreyv/yii2-service-events-client "^1.0"
 ```
 
 or add
 
 ```
-"andreyv/yii2-events": "^1.0"
+"andreyv/yii2-service-events-client": "^1.0"
 ```
 
 to the require section of your `composer.json` file.
