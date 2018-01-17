@@ -9,7 +9,6 @@ interface EventsServiceInterface
      *
      * @param string $event Event name
      * @param array $data Event data
-     * @return bool
      */
     public function fire(string $event, array $data);
 
@@ -19,7 +18,6 @@ interface EventsServiceInterface
      * @param string $event Event name
      * @param string $endpoint Event endpoint
      * @param string $method Http method
-     * @return bool
      */
     public function subscribe(string $event, string $endpoint, string $method = 'post');
 
@@ -28,7 +26,6 @@ interface EventsServiceInterface
      *
      * @param string $event Event name
      * @param string $endpoint Event endpoint
-     * @return bool
      */
     public function unsubscribe(string $event, string $endpoint);
 }

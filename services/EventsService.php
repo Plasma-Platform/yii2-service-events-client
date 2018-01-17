@@ -10,9 +10,15 @@ use indigerd\oauth2\authfilter\Module as AuthFilter;
 
 class EventsService implements EventsServiceInterface
 {
-    const SCOPES = 'events event-subscriptions';
+    /**
+     * @var string $scopes OAuth token scopes
+     */
+    protected static $scopes = 'events event-subscriptions';
 
-    const GRANT_TYPE = 'client_credentials';
+    /**
+     * @var string $grantType OAuth token grant type
+     */
+    protected static $grantType = 'client_credentials';
 
     /**
      * @var bool $testMode Allows to skip real API requests for test environment
@@ -51,7 +57,7 @@ class EventsService implements EventsServiceInterface
      */
     public function fire(string $event, array $data)
     {
-        return $this->sendRequest(
+        $this->sendRequest(
             'events',
             [
                 'name' => $event,
@@ -65,7 +71,7 @@ class EventsService implements EventsServiceInterface
      */
     public function subscribe(string $event, string $endpoint, string $method = 'post')
     {
-        return $this->sendRequest(
+        $this->sendRequest(
             'event-subscriptions',
             [
                 'event' => $event,
@@ -80,7 +86,7 @@ class EventsService implements EventsServiceInterface
      */
     public function unsubscribe(string $event, string $endpoint)
     {
-        return $this->sendRequest(
+        $this->sendRequest(
             'event-subscriptions/' . $event . '/' . urlencode(trim(trim($endpoint), '/')),
             [],
             'delete'
@@ -93,14 +99,13 @@ class EventsService implements EventsServiceInterface
      * @param string $uri
      * @param array $params
      * @param string $method
-     * @return bool
      * @throws HttpException
      * @throws InvalidConfigException
      */
     protected function sendRequest(string $uri, array $params = [], string $method = 'post')
     {
         if ($this->testMode) {
-            return true;
+            return;
         }
         $this->httpClient->{$method}(
             $uri,
@@ -111,31 +116,32 @@ class EventsService implements EventsServiceInterface
                 ]
             ]
         );
-        return true;
     }
 
     /**
-     * Returns current client access token or generates new token
+     * Return current client access token or generate new token
      *
      * @return string
      * @throws HttpException
      * @throws InvalidConfigException
      */
-    protected function getClientAccessToken()
+    protected function getClientAccessToken(): string
     {
         return $this->accessToken ?? $this->requestClientAccessToken();
     }
 
     /**
+     * Request new OAuth client access token
+     *
      * @return string
      * @throws InvalidConfigException
      * @throws HttpException
      */
-    protected function requestClientAccessToken()
+    protected function requestClientAccessToken(): string
     {
-        $response = $this->authFilter->requestAccessToken('', '', self::SCOPES, false, self::GRANT_TYPE);
+        $response = $this->authFilter->requestAccessToken('', '', self::$scopes, false, self::$grantType);
         if (empty($response['access_token'])) {
-            throw new InvalidCallException('Auth service response don\'t have token: ' . json_encode($response));
+            throw new InvalidCallException('Auth service response does not have token: ' . json_encode($response));
         }
         $this->accessToken = $response['access_token'];
         return $response['access_token'];
