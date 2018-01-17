@@ -13,12 +13,12 @@ class EventsService implements EventsServiceInterface
     /**
      * @var string $scopes OAuth token scopes
      */
-    protected static $scopes = 'events event-subscriptions';
+    protected $scopes;
 
     /**
      * @var string $grantType OAuth token grant type
      */
-    protected static $grantType = 'client_credentials';
+    protected $grantType;
 
     /**
      * @var bool $testMode Allows to skip real API requests for test environment
@@ -44,12 +44,21 @@ class EventsService implements EventsServiceInterface
      * @param HttpClient $httpClient
      * @param AuthFilter $authFilter
      * @param bool $testMode
+     * @param string $scopes
+     * @param string $grantType
      */
-    public function __construct (HttpClient $httpClient, AuthFilter $authFilter, bool $testMode = false )
-    {
+    public function __construct(
+        HttpClient $httpClient,
+        AuthFilter $authFilter,
+        bool $testMode = false,
+        string $scopes = 'events event-subscriptions',
+        string $grantType = 'client_credentials'
+    ) {
         $this->httpClient = $httpClient;
         $this->authFilter = $authFilter;
         $this->testMode = $testMode;
+        $this->scopes = $scopes;
+        $this->grantType = $grantType;
     }
 
     /**
@@ -139,7 +148,7 @@ class EventsService implements EventsServiceInterface
      */
     protected function requestClientAccessToken(): string
     {
-        $response = $this->authFilter->requestAccessToken('', '', self::$scopes, false, self::$grantType);
+        $response = $this->authFilter->requestAccessToken('', '', $this->scopes, false, $this->grantType);
         if (empty($response['access_token'])) {
             throw new InvalidCallException('Auth service response does not have token: ' . json_encode($response));
         }
