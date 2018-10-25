@@ -93,10 +93,11 @@ class EventsService implements EventsServiceInterface
     /**
      * @inheritdoc
      */
-    public function unsubscribe(string $event, string $endpoint)
+    public function unsubscribe(string $event, string $endpoint, $method = null)
     {
         $this->sendRequest(
-            'event-subscriptions/' . $event . '/' . urlencode(trim($endpoint, " \t\n\r\0\x0B\/")),
+            'event-subscriptions/' . $event .
+                ($method ? '/' . $method : '') . '/' . urlencode(trim($endpoint, " \t\n\r\0\x0B\/")),
             [],
             'delete'
         );

@@ -26,6 +26,7 @@ interface EventsServiceInterface
      *
      * @param string $event Event name
      * @param string $endpoint Event endpoint
+     * @param string|null $method
      */
-    public function unsubscribe(string $event, string $endpoint);
+    public function unsubscribe(string $event, string $endpoint, $method = null);
 }
