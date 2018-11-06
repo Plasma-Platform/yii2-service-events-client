@@ -64,13 +64,14 @@ class EventsService implements EventsServiceInterface
     /**
      * @inheritdoc
      */
-    public function fire(string $event, array $data)
+    public function fire(string $event, array $data, string $version = null)
     {
         $this->sendRequest(
             'events',
             [
                 'name' => $event,
                 'data' => $data,
+                'version' => $version
             ]
         );
     }
@@ -78,7 +79,7 @@ class EventsService implements EventsServiceInterface
     /**
      * @inheritdoc
      */
-    public function subscribe(string $event, string $endpoint, string $method = 'post')
+    public function subscribe(string $event, string $endpoint, string $method = 'post', string $version = null)
     {
         $this->sendRequest(
             'event-subscriptions',
@@ -86,6 +87,7 @@ class EventsService implements EventsServiceInterface
                 'event' => $event,
                 'endpoint' => $endpoint,
                 'method' => $method,
+                'version' => $version,
             ]
         );
     }
@@ -93,11 +95,12 @@ class EventsService implements EventsServiceInterface
     /**
      * @inheritdoc
      */
-    public function unsubscribe(string $event, string $endpoint, $method = null)
+    public function unsubscribe(string $event, string $endpoint, $method = null, string $version = null)
     {
         $this->sendRequest(
             'event-subscriptions/' . $event .
-                ($method ? '/' . $method : '') . '/' . urlencode(trim($endpoint, " \t\n\r\0\x0B\/")),
+                ($version && $method ? '/' . $version . '/' . $method  : '') .
+                '/' . urlencode(trim($endpoint, " \t\n\r\0\x0B\/")),
             [],
             'delete'
         );
