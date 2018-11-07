@@ -28,8 +28,16 @@ interface EventsServiceInterface
      *
      * @param string $event Event name
      * @param string $endpoint Event endpoint
-     * @param string|null $method
-     * @param string|null $version
      */
-    public function unsubscribe(string $event, string $endpoint, $method = null, string $version = null);
+    public function unsubscribe(string $event, string $endpoint);
+
+    /**
+     * Remove versionized subscription on event
+     *
+     * @param string $event Event name
+     * @param string $endpoint Event endpoint
+     * @param string $method
+     * @param string $version
+     */
+    public function unsubscribeVersionized(string $event, string $endpoint, $method, string $version);
 }

@@ -95,12 +95,19 @@ class EventsService implements EventsServiceInterface
     /**
      * @inheritdoc
      */
-    public function unsubscribe(string $event, string $endpoint, $method = null, string $version = null)
+    public function unsubscribe(string $event, string $endpoint)
     {
         $this->sendRequest(
-            'event-subscriptions/' . $event .
-                ($version && $method ? '/' . $version . '/' . $method  : '') .
-                '/' . urlencode(trim($endpoint, " \t\n\r\0\x0B\/")),
+            'event-subscriptions/' . $event . '/' . $this->urlEncode($endpoint),
+            [],
+            'delete'
+        );
+    }
+
+    public function unsubscribeVersionized(string $event, string $endpoint, string $method, string $version)
+    {
+        $this->sendRequest(
+            'event-subscriptions/' . $event . '/' . $version . '/' . $method . '/' . $this->urlEncode($endpoint),
             [],
             'delete'
         );
@@ -158,5 +165,15 @@ class EventsService implements EventsServiceInterface
         }
         $this->accessToken = $response['access_token'];
         return $response['access_token'];
+    }
+
+    /**
+     * Encode and trim endpoint
+     * @param $endpoint
+     * @return string
+     */
+    private function urlEncode($endpoint)
+    {
+        return urlencode(trim($endpoint, " \t\n\r\0\x0B\/"));
     }
 }
