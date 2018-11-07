@@ -39,5 +39,5 @@ interface EventsServiceInterface
      * @param string $method
      * @param string $version
      */
-    public function unsubscribeVersionized(string $event, string $endpoint, $method, string $version);
+    public function unsubscribeVersionized(string $event, string $endpoint, string $method, string $version);
 }
