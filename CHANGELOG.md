@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2018-11-07
+### Added
+- Versionized events support
+
 ## [1.1.0] - 2018-10-25
 ### Added
 - Unsubscribe method optional parameter
