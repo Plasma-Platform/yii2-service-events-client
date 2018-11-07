@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2018-11-07
+### Added
+- Versionized events support
+
 ## [1.1.0] - 2018-10-25
 ### Added
 - Unsubscribe method optional parameter
@@ -14,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Base component implementation
 
-[Unreleased]: https://github.com/andrey-tm/yii2-service-events-client/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/andrey-tm/yii2-service-events-client/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/andrey-tm/yii2-service-events-client/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/andrey-tm/yii2-service-events-client/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/andrey-tm/yii2-service-events-client/tree/1.0.0
